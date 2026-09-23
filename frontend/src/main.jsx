@@ -6,11 +6,23 @@ function App() {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleClick() {
+  async function handleClick() {
     setIsLoading(true);
-    void fetch('/api/hello').catch(() => {});
-    setMessage('Request sent. The backend is not connected yet.');
-    setIsLoading(false);
+
+    try {
+      const response = await fetch('/api/hello');
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      setMessage(data.message);
+    } catch {
+      setMessage('Could not read a response from the backend.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
