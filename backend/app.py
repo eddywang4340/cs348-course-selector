@@ -8,8 +8,9 @@ from flask import Flask, jsonify
 load_dotenv()
 app = Flask(__name__)
 
-# Name of the table you created in the Supabase dashboard
-TABLE_NAME = "Test"
+# Milestone 0: toy table used only to test the database connection.
+# See schema.sql / seed.sql in this folder. This is NOT the final schema.
+TABLE_NAME = "courses"
 
 
 @app.get("/api/hello")
@@ -19,7 +20,7 @@ def hello():
             cur.execute(sql.SQL("SELECT * FROM {}").format(sql.Identifier(TABLE_NAME)))
             rows = cur.fetchall()
 
-    return jsonify({"message": "Hello, world!"})
+    return jsonify({"courses": rows})
 
 
 if __name__ == "__main__":
