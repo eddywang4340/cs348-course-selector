@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client';
 import './styles.css';
 
 function App() {
+  const [courses, setCourses] = useState([]);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleClick() {
     setIsLoading(true);
+    setMessage('');
 
     try {
       const response = await fetch('/api/hello');
@@ -17,7 +19,7 @@ function App() {
       }
 
       const data = await response.json();
-      setMessage(data.message);
+      setCourses(data.courses);
     } catch {
       setMessage('Could not read a response from the backend.');
     } finally {
@@ -37,6 +39,13 @@ function App() {
         <p className="status" role="status" aria-live="polite">
           {message}
         </p>
+        <ul>
+          {courses.map((course) => (
+            <li key={course.course_id}>
+              {course.course_code}: {course.course_name}
+            </li>
+          ))}
+        </ul>
       </section>
     </main>
   );
