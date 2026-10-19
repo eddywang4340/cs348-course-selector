@@ -1,1 +1,0 @@
--- Seed data for cs348_sample (small dev/test dataset). Nothing here yet.
