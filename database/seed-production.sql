@@ -1,0 +1,2 @@
+-- Seed data for cs348_production (~3,000 UW courses). Nothing here yet;
+-- may be replaced by a Python/ETL seeding script later.

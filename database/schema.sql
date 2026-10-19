@@ -1,0 +1,2 @@
+-- Shared schema for cs348_sample and cs348_production. No CREATE DATABASE here.
+-- Tables, constraints, and indexes go here once the schema is designed.

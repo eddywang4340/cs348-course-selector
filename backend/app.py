@@ -1,7 +1,6 @@
 import os
-import psycopg
-from psycopg import sql
-from psycopg.rows import dict_row
+import pymysql
+from pymysql.cursors import DictCursor
 from dotenv import load_dotenv
 from flask import Flask, jsonify
 
@@ -13,12 +12,26 @@ app = Flask(__name__)
 TABLE_NAME = "courses"
 
 
+def get_connection():
+    return pymysql.connect(
+        host=os.environ.get("MYSQL_HOST", "127.0.0.1"),
+        port=int(os.environ.get("MYSQL_PORT", 3306)),
+        user=os.environ.get("MYSQL_USER", "root"),
+        password=os.environ.get("MYSQL_PASSWORD", ""),
+        database=os.environ["MYSQL_DATABASE"],
+        cursorclass=DictCursor,
+    )
+
+
 @app.get("/api/hello")
 def hello():
-    with psycopg.connect(os.environ["DATABASE_URL"], row_factory=dict_row) as conn:
+    conn = get_connection()
+    try:
         with conn.cursor() as cur:
-            cur.execute(sql.SQL("SELECT * FROM {}").format(sql.Identifier(TABLE_NAME)))
+            cur.execute(f"SELECT * FROM `{TABLE_NAME}`")
             rows = cur.fetchall()
+    finally:
+        conn.close()
 
     return jsonify({"courses": rows})
 
