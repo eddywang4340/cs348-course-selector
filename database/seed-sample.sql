@@ -39,8 +39,17 @@ INSERT INTO Checklist (user_id, course_id, status) VALUES
 
 INSERT INTO Category (category_id, name, min_units) VALUES
     ('COMM_LIST_1', 'Communications List 1', 0.50),
-    ('HUMANITIES', 'Humanities Requirement', 0.50);
+    ('HUMANITIES', 'Humanities Requirement', 0.50),
+    ('SOCIAL_SCI', 'Social Sciences Requirement', 0.50),
+    ('PURE_SCI', 'Pure Sciences Requirement', 0.50),
+    ('PURE_APPLIED_SCI', 'Pure and Applied Sciences Requirement', 0.50);
 
 INSERT INTO CourseCategory (category_id, course_id) VALUES
-    ('COMM_LIST_1', 10),
-    ('HUMANITIES', 10);
+    ('COMM_LIST_1', 10);
+
+-- BIOL counts toward both science categories.
+INSERT INTO SubjectCategory (category_id, subject) VALUES
+    ('HUMANITIES', 'COMMST'),
+    ('SOCIAL_SCI', 'ECON'),
+    ('PURE_SCI', 'BIOL'),
+    ('PURE_APPLIED_SCI', 'BIOL');

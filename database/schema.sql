@@ -68,3 +68,10 @@ CREATE TABLE CourseCategory (
     FOREIGN KEY (category_id) REFERENCES Category(category_id),
     FOREIGN KEY (course_id) REFERENCES Course(course_id)
 );
+
+CREATE TABLE SubjectCategory (
+    category_id VARCHAR(50) NOT NULL,
+    subject VARCHAR(10) NOT NULL,
+    PRIMARY KEY (category_id, subject),
+    FOREIGN KEY (category_id) REFERENCES Category(category_id)
+);

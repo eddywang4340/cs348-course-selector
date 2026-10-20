@@ -25,7 +25,7 @@ ORDER BY c.subject, c.catalog_number
 | CS      | 348            | Introduction to Database Management  | planned     |
 | CS      | 350            | Operating Systems                    | completed   |
 +---------+----------------+--------------------------------------+-------------+
-3 rows in set (0.001 sec)
+3 rows in set (0.000 sec)
 
 --------------
 UPDATE Checklist ch
@@ -36,7 +36,7 @@ WHERE ch.user_id = @user_id
   AND c.catalog_number = '348'
 --------------
 
-Query OK, 1 row affected (0.002 sec)
+Query OK, 1 row affected (0.001 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
 
 --------------
