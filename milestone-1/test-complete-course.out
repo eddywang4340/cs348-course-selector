@@ -5,7 +5,7 @@ USE CoursePlanner
 Query OK, 0 rows affected (0.000 sec)
 
 --------------
-SET @user_id = 1
+SET @user_id = 1, @subject = 'CS'
 --------------
 
 Query OK, 0 rows affected (0.000 sec)
@@ -25,13 +25,7 @@ ORDER BY c.subject, c.catalog_number
 | CS      | 348            | Introduction to Database Management  | planned     |
 | CS      | 350            | Operating Systems                    | completed   |
 +---------+----------------+--------------------------------------+-------------+
-3 rows in set (0.000 sec)
-
---------------
-SET @user_id = 1, @subject = 'CS', @catalog = '348'
---------------
-
-Query OK, 0 rows affected (0.000 sec)
+3 rows in set (0.001 sec)
 
 --------------
 UPDATE Checklist ch
@@ -39,14 +33,31 @@ NATURAL JOIN Course c
 SET ch.status = 'completed'
 WHERE ch.user_id = @user_id
   AND c.subject = @subject
-  AND c.catalog_number = @catalog
+  AND c.catalog_number = '348'
 --------------
 
 Query OK, 1 row affected (0.002 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
 
 --------------
-SET @user_id = 1, @subject = 'CS', @catalog = '341'
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+--------------------------------------+-------------+
+| subject | catalog_number | title                                | status      |
++---------+----------------+--------------------------------------+-------------+
+| CS      | 246            | Object-Oriented Software Development | in_progress |
+| CS      | 348            | Introduction to Database Management  | completed   |
+| CS      | 350            | Operating Systems                    | completed   |
++---------+----------------+--------------------------------------+-------------+
+3 rows in set (0.000 sec)
+
+--------------
+SET @user_id = 1, @subject = 'CS'
 --------------
 
 Query OK, 0 rows affected (0.000 sec)
@@ -57,32 +68,31 @@ NATURAL JOIN Course c
 SET ch.status = 'completed'
 WHERE ch.user_id = @user_id
   AND c.subject = @subject
-  AND c.catalog_number = @catalog
---------------
-
-Query OK, 0 rows affected (0.000 sec)
-Rows matched: 0  Changed: 0  Warnings: 0
-
---------------
-SET @user_id = 1, @subject = 'CS', @catalog = '350'
---------------
-
-Query OK, 0 rows affected (0.000 sec)
-
---------------
-UPDATE Checklist ch
-NATURAL JOIN Course c
-SET ch.status = 'completed'
-WHERE ch.user_id = @user_id
-  AND c.subject = @subject
-  AND c.catalog_number = @catalog
+  AND c.catalog_number = '350'
 --------------
 
 Query OK, 0 rows affected (0.000 sec)
 Rows matched: 1  Changed: 0  Warnings: 0
 
 --------------
-SET @user_id = 1, @subject = 'CS', @catalog = '246'
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+--------------------------------------+-------------+
+| subject | catalog_number | title                                | status      |
++---------+----------------+--------------------------------------+-------------+
+| CS      | 246            | Object-Oriented Software Development | in_progress |
+| CS      | 348            | Introduction to Database Management  | completed   |
+| CS      | 350            | Operating Systems                    | completed   |
++---------+----------------+--------------------------------------+-------------+
+3 rows in set (0.000 sec)
+
+--------------
+SET @user_id = 1, @subject = 'CS'
 --------------
 
 Query OK, 0 rows affected (0.000 sec)
@@ -93,17 +103,11 @@ NATURAL JOIN Course c
 SET ch.status = 'completed'
 WHERE ch.user_id = @user_id
   AND c.subject = @subject
-  AND c.catalog_number = @catalog
+  AND c.catalog_number = '246'
 --------------
 
-Query OK, 1 row affected (0.001 sec)
+Query OK, 1 row affected (0.000 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
-
---------------
-SET @user_id = 1
---------------
-
-Query OK, 0 rows affected (0.000 sec)
 
 --------------
 SELECT c.subject, c.catalog_number, c.title, ch.status
@@ -120,6 +124,6 @@ ORDER BY c.subject, c.catalog_number
 | CS      | 348            | Introduction to Database Management  | completed |
 | CS      | 350            | Operating Systems                    | completed |
 +---------+----------------+--------------------------------------+-----------+
-3 rows in set (0.001 sec)
+3 rows in set (0.000 sec)
 
 Bye
