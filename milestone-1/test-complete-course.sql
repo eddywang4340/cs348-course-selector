@@ -19,7 +19,7 @@
 USE CoursePlanner;
 
 -- Before: User 1's (pre-existing) checklist
--- Expected: CS 348 planned, CS 350 completed
+-- Expected: CS 246 in_progress, CS 348 planned, CS 350 completed
 SET @user_id = 1;
 SELECT c.subject, c.catalog_number, c.title, ch.status
 FROM Checklist ch
@@ -59,8 +59,19 @@ WHERE ch.user_id = @user_id
   AND c.subject = @subject
   AND c.catalog_number = @catalog;
 
+-- Test 4: Course is currently being taken (in_progress -> completed)
+-- Expected: Rows matched: 1  Changed: 1
+-- CS 246's status is changed to 'completed' for User 1
+SET @user_id = 1, @subject = 'CS', @catalog = '246';
+UPDATE Checklist ch
+NATURAL JOIN Course c
+SET ch.status = 'completed'
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog;
+
 -- After: User 1's (updated) checklist
--- Expected: CS 348 completed, CS 350 completed
+-- Expected: CS 246 completed, CS 348 completed, CS 350 completed
 SET @user_id = 1;
 SELECT c.subject, c.catalog_number, c.title, ch.status
 FROM Checklist ch

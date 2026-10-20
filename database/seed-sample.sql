@@ -31,6 +31,7 @@ INSERT INTO `User` (user_id, username, next_study_term) VALUES
     (2, 'j45smith', '2B');
 
 INSERT INTO Checklist (user_id, course_id, status) VALUES
+    (1, 4, 'in_progress'),
     (1, 7, 'planned'),
     (1, 8, 'completed'),
     (2, 1, 'completed'),
