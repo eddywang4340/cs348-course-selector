@@ -1,3 +1,5 @@
+USE CoursePlanner;
+
 INSERT INTO Course (course_id, subject, catalog_number, title, units, min_term) VALUES
     (1, 'CS', '135', 'Designing Functional Programs', 0.50, NULL),
     (2, 'CS', '136', 'Elementary Algorithm Design and Data Abstraction', 0.50, NULL),

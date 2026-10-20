@@ -1,0 +1,105 @@
+--------------
+USE CoursePlanner
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @user_id = 1
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+-------------------------------------+-----------+
+| subject | catalog_number | title                               | status    |
++---------+----------------+-------------------------------------+-----------+
+| CS      | 348            | Introduction to Database Management | completed |
+| CS      | 350            | Operating Systems                   | completed |
++---------+----------------+-------------------------------------+-----------+
+2 rows in set (0.001 sec)
+
+--------------
+SET @user_id = 1, @subject = 'CS', @catalog = '348'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+UPDATE Checklist ch
+NATURAL JOIN Course c
+SET ch.status = 'completed'
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog
+--------------
+
+Query OK, 0 rows affected (0.001 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SET @user_id = 1, @subject = 'CS', @catalog = '341'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+UPDATE Checklist ch
+NATURAL JOIN Course c
+SET ch.status = 'completed'
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+--------------
+SET @user_id = 1, @subject = 'CS', @catalog = '350'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+UPDATE Checklist ch
+NATURAL JOIN Course c
+SET ch.status = 'completed'
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SET @user_id = 1
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+-------------------------------------+-----------+
+| subject | catalog_number | title                               | status    |
++---------+----------------+-------------------------------------+-----------+
+| CS      | 348            | Introduction to Database Management | completed |
+| CS      | 350            | Operating Systems                   | completed |
++---------+----------------+-------------------------------------+-----------+
+2 rows in set (0.000 sec)
+
+Bye

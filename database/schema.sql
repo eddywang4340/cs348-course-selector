@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS CoursePlanner;
+CREATE DATABASE IF NOT EXISTS CoursePlanner;
+USE CoursePlanner;
+
 CREATE TABLE Course (
     course_id INT PRIMARY KEY,
     subject VARCHAR(10) NOT NULL,
