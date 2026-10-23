@@ -1,5 +1,5 @@
 -- ============================================================
--- Feature R9: Complete a course on the checklist
+-- Feature R8: Complete a course on the checklist
 -- A student finds a course on their checklist (e.g. "CS 348") and marks
 -- that course as completed (status = 'completed').
 --

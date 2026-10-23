@@ -1,0 +1,152 @@
+--------------
+SET @user_id = 2, @subject = 'CS'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+--------------------------------------------------+-------------+
+| subject | catalog_number | title                                            | status      |
++---------+----------------+--------------------------------------------------+-------------+
+| CS      | 135            | Designing Functional Programs                    | completed   |
+| CS      | 136            | Elementary Algorithm Design and Data Abstraction | in_progress |
++---------+----------------+--------------------------------------------------+-------------+
+2 rows in set (0.00 sec)
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status)
+SELECT @user_id, c.course_id, 'planned'
+FROM Course c
+WHERE c.subject = @subject
+  AND c.catalog_number = '245'
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+--------------------------------------------------+-------------+
+| subject | catalog_number | title                                            | status      |
++---------+----------------+--------------------------------------------------+-------------+
+| CS      | 135            | Designing Functional Programs                    | completed   |
+| CS      | 136            | Elementary Algorithm Design and Data Abstraction | in_progress |
+| CS      | 245            | Logic and Computation                            | planned     |
++---------+----------------+--------------------------------------------------+-------------+
+3 rows in set (0.00 sec)
+
+--------------
+UPDATE Checklist
+SET status = 'in_progress'
+WHERE user_id = @user_id
+  AND course_id = 3
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+--------------------------------------------------+-------------+
+| subject | catalog_number | title                                            | status      |
++---------+----------------+--------------------------------------------------+-------------+
+| CS      | 135            | Designing Functional Programs                    | completed   |
+| CS      | 136            | Elementary Algorithm Design and Data Abstraction | in_progress |
+| CS      | 245            | Logic and Computation                            | in_progress |
++---------+----------------+--------------------------------------------------+-------------+
+3 rows in set (0.00 sec)
+
+--------------
+DELETE FROM Checklist
+WHERE user_id = @user_id
+  AND course_id = (SELECT course_id
+                   FROM Course
+                   WHERE subject = @subject
+                     AND catalog_number = '245')
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+--------------------------------------------------+-------------+
+| subject | catalog_number | title                                            | status      |
++---------+----------------+--------------------------------------------------+-------------+
+| CS      | 135            | Designing Functional Programs                    | completed   |
+| CS      | 136            | Elementary Algorithm Design and Data Abstraction | in_progress |
++---------+----------------+--------------------------------------------------+-------------+
+2 rows in set (0.00 sec)
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status)
+SELECT @user_id, c.course_id, 'planned'
+FROM Course c
+WHERE c.subject = @subject
+  AND c.catalog_number = '135'
+--------------
+
+ERROR 1062 (23000) at line 95: Duplicate entry '2-1' for key 'checklist.PRIMARY'
+--------------
+INSERT INTO Checklist (user_id, course_id, status)
+SELECT @user_id, c.course_id, 'planned'
+FROM Course c
+WHERE c.subject = @subject
+  AND c.catalog_number = '999'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+--------------
+DELETE FROM Checklist
+WHERE user_id = @user_id
+  AND course_id = (SELECT course_id
+                   FROM Course
+                   WHERE subject = @subject
+                     AND catalog_number = '348')
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+NATURAL JOIN Course c
+WHERE ch.user_id = @user_id
+ORDER BY c.subject, c.catalog_number
+--------------
+
++---------+----------------+--------------------------------------------------+-------------+
+| subject | catalog_number | title                                            | status      |
++---------+----------------+--------------------------------------------------+-------------+
+| CS      | 135            | Designing Functional Programs                    | completed   |
+| CS      | 136            | Elementary Algorithm Design and Data Abstraction | in_progress |
++---------+----------------+--------------------------------------------------+-------------+
+2 rows in set (0.00 sec)
+
+Bye
