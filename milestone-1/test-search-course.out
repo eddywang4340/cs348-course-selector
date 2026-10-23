@@ -1,0 +1,76 @@
+--------------
+SET @subject = 'CS', @catalog_number = '348'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term
+FROM Course
+WHERE subject = @subject
+  AND catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.00 sec)
+
+--------------
+SET @subject = 'COMMST', @catalog_number = '223'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term
+FROM Course
+WHERE subject = @subject
+  AND catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-----------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title           | description | units | min_term |
++-----------+---------+----------------+-----------------+-------------+-------+----------+
+|        10 | COMMST  | 223            | Public Speaking | NULL        |  0.50 | NULL     |
++-----------+---------+----------------+-----------------+-------------+-------+----------+
+1 row in set (0.00 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '246E'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term
+FROM Course
+WHERE subject = @subject
+  AND catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                                           | description | units | min_term |
++-----------+---------+----------------+-------------------------------------------------+-------------+-------+----------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) | NULL        |  0.50 | NULL     |
++-----------+---------+----------------+-------------------------------------------------+-------------+-------+----------+
+1 row in set (0.00 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '999'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term
+FROM Course
+WHERE subject = @subject
+  AND catalog_number = @catalog_number
+--------------
+
+Empty set (0.00 sec)
+
+Bye
