@@ -47,9 +47,9 @@ INSERT INTO Category (category_id, name, min_units) VALUES
 INSERT INTO CourseCategory (category_id, course_id) VALUES
     ('COMM_LIST_1', 10);
 
--- BIOL counts toward both science categories.
+-- COMMST isn't on the official UW breadth list in seed-production.sql, so it's
+-- added here. The other subject/category pairs that used to be hand-picked
+-- here (ECON, BIOL) are already covered by seed-production.sql's full list,
+-- so adding them again here would collide on the primary key.
 INSERT INTO SubjectCategory (category_id, subject) VALUES
-    ('HUMANITIES', 'COMMST'),
-    ('SOCIAL_SCI', 'ECON'),
-    ('PURE_SCI', 'BIOL'),
-    ('PURE_APPLIED_SCI', 'BIOL');
+    ('HUMANITIES', 'COMMST');

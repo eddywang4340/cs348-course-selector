@@ -1,0 +1,139 @@
+--------------
+SET @subject = 'CS', @catalog_number = '348'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT p.prereq_course_id AS course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Prereq p ON p.course_id = c0.course_id
+JOIN Course c ON c.course_id = p.prereq_course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+--------------------------------------+
+| course_id | subject | catalog_number | title                                |
++-----------+---------+----------------+--------------------------------------+
+|         4 | CS      | 246            | Object-Oriented Software Development |
+|         5 | CS      | 241            | Foundations of Sequential Programs   |
++-----------+---------+----------------+--------------------------------------+
+2 rows in set (0.00 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)
+JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id)
+              AND c.course_id != c0.course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
+Empty set (0.00 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '246'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT p.prereq_course_id AS course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Prereq p ON p.course_id = c0.course_id
+JOIN Course c ON c.course_id = p.prereq_course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+--------------------------------------------------+
+| course_id | subject | catalog_number | title                                            |
++-----------+---------+----------------+--------------------------------------------------+
+|         2 | CS      | 136            | Elementary Algorithm Design and Data Abstraction |
+|         3 | CS      | 245            | Logic and Computation                            |
++-----------+---------+----------------+--------------------------------------------------+
+2 rows in set (0.00 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)
+JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id)
+              AND c.course_id != c0.course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
++-----------+---------+----------------+-------------------------------------------------+
+1 row in set (0.00 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '246E'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT p.prereq_course_id AS course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Prereq p ON p.course_id = c0.course_id
+JOIN Course c ON c.course_id = p.prereq_course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
+Empty set (0.00 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)
+JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id)
+              AND c.course_id != c0.course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+--------------------------------------+
+| course_id | subject | catalog_number | title                                |
++-----------+---------+----------------+--------------------------------------+
+|         4 | CS      | 246            | Object-Oriented Software Development |
++-----------+---------+----------------+--------------------------------------+
+1 row in set (0.00 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '135'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT p.prereq_course_id AS course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Prereq p ON p.course_id = c0.course_id
+JOIN Course c ON c.course_id = p.prereq_course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
+Empty set (0.00 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)
+JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id)
+              AND c.course_id != c0.course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
+Empty set (0.00 sec)
+
+Bye

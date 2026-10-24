@@ -4,13 +4,13 @@
 
 This section demonstrates that the app can connect to a database and query rows from it. The table used here (`courses`) is a **simplified toy table for testing the connection only**, and is **not** the project's final schema, which will be designed in a later milestone.
 
-The database is local MySQL (see "Local MySQL Database Setup" below) -- run that section first so `cs348_sample` exists.
+The database is local MySQL (see "Local MySQL Database Setup" below) -- run that section first so `CoursePlanner` exists.
 
 ### 1. Create the toy table and load sample rows
 
 ```
-mysql -u root cs348_sample < backend/schema.sql
-mysql -u root cs348_sample < backend/seed.sql
+mysql -u root CoursePlanner < backend/schema.sql
+mysql -u root CoursePlanner < backend/seed.sql
 ```
 
 (add `-p` if your local MySQL user has a password).
@@ -49,12 +49,7 @@ Open the frontend URL printed by `npm run dev` (typically `http://localhost:5173
 
 ## Local MySQL Database Setup
 
-Separately from the Milestone 0 Supabase/Postgres demo above, the project's actual schema is being developed against **local MySQL**, with two databases sharing one schema:
-
-- `cs348_sample` — a small dataset for development and testing.
-- `cs348_production` — a larger dataset (eventually ~3,000 University of Waterloo courses and related entities).
-
-The schema is not finalized yet, so `database/schema.sql` and the seed files are currently empty scaffolds — this section documents the setup workflow for once they're filled in.
+Separately from the Milestone 0 Supabase/Postgres demo above, the project's actual schema lives in a single local MySQL database, `CoursePlanner`. `database/schema.sql` drops and recreates `CoursePlanner` itself, then `database/seed-sample.sql` loads the hand-written sample dataset and `database/seed-production.sql` loads the real UW subject/breadth-category reference data.
 
 ### Prerequisites
 
@@ -74,8 +69,6 @@ MYSQL_HOST=127.0.0.1
 MYSQL_PORT=3306
 MYSQL_USER=root
 MYSQL_PASSWORD=
-SAMPLE_DB=cs348_sample
-PRODUCTION_DB=cs348_production
 ```
 
 Set `MYSQL_PASSWORD` to match your local MySQL user (leave blank if that user has no password). `.env` is git-ignored; `.env.example` is tracked.
@@ -86,29 +79,19 @@ Set `MYSQL_PASSWORD` to match your local MySQL user (leave blank if that user ha
 ./scripts/setup-db.sh
 ```
 
-This creates `cs348_sample` and `cs348_production` if they don't already exist, applies `database/schema.sql` to both, and seeds `cs348_sample` from `database/seed-sample.sql` and `cs348_production` from `database/seed-production.sql`. It's safe to re-run — by default it never drops existing databases or data.
+This drops and recreates `CoursePlanner` (via `database/schema.sql`), then seeds it from `database/seed-sample.sql` and `database/seed-production.sql`. Every run resets the database — there's no separate `--reset` flag, since `schema.sql` always starts from a clean slate.
 
-### 3. Resetting both databases
-
-To wipe and recreate both databases from scratch (e.g. after a schema change):
+### 3. Verifying the database exists
 
 ```
-./scripts/setup-db.sh --reset
-```
-
-This **permanently deletes all data** in both `cs348_sample` and `cs348_production` immediately, with no confirmation prompt.
-
-### 4. Verifying the databases exist
-
-```
-mysql -u root --execute "SHOW DATABASES LIKE 'cs348_%';"
+mysql -u root -e "SHOW TABLES IN CoursePlanner;"
 ```
 
 (add `-p` if your local MySQL user requires a password).
 
-### 5. Adding schema and seed data
+### 4. Adding schema and seed data
 
-As the relational schema is designed, add table/constraint/index definitions to [`database/schema.sql`](database/schema.sql) (shared by both databases), hand-written sample rows to [`database/seed-sample.sql`](database/seed-sample.sql), and the larger real dataset to [`database/seed-production.sql`](database/seed-production.sql) (this may later be replaced by a separate ETL/Python seeding script).
+Table/constraint/index definitions live in [`database/schema.sql`](database/schema.sql), hand-written sample rows in [`database/seed-sample.sql`](database/seed-sample.sql), and real reference data in [`database/seed-production.sql`](database/seed-production.sql) — keep the two seed files free of overlapping rows, since both load into the same database.
 
 ### Reproducing this setup on a new machine
 
