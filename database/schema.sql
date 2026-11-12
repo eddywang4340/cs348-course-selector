@@ -16,6 +16,7 @@ CREATE TABLE Course (
 CREATE TABLE Prereq (
     course_id INT NOT NULL,
     prereq_course_id INT NOT NULL,
+    alt_group INT NULL, -- same number means you only need one of these prerequisites
     PRIMARY KEY (course_id, prereq_course_id),
     FOREIGN KEY (course_id) REFERENCES Course(course_id),
     FOREIGN KEY (prereq_course_id) REFERENCES Course(course_id),

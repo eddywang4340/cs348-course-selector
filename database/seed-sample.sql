@@ -13,12 +13,12 @@ INSERT INTO Course (course_id, subject, catalog_number, title, units, min_term) 
     (10, 'COMMST', '223', 'Public Speaking', 0.50, NULL),
     (11, 'CS', '246E', 'Object-Oriented Software Development (Enriched)', 0.50, NULL);
 
-INSERT INTO Prereq (course_id, prereq_course_id) VALUES
-    (4, 2), (4, 3),
-    (5, 4),
-    (6, 5),
-    (7, 4), (7, 5),
-    (8, 5);
+INSERT INTO Prereq (course_id, prereq_course_id, alt_group) VALUES
+    (4, 2, 2), (4, 3, 3),
+    (5, 4, 4),
+    (6, 5, 5),
+    (7, 4, 4), (7, 5, 5),
+    (8, 5, 5);
 
 INSERT INTO Coreq (course_id, coreq_course_id) VALUES
     (5, 9);

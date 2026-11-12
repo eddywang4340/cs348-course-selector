@@ -49,7 +49,7 @@ Open the frontend URL printed by `npm run dev` (typically `http://localhost:5173
 
 ## Local MySQL Database Setup
 
-Separately from the Milestone 0 Supabase/Postgres demo above, the project's actual schema lives in a single local MySQL database, `CoursePlanner`. `database/schema.sql` drops and recreates `CoursePlanner` itself, then `database/seed-sample.sql` loads the hand-written sample dataset and `database/seed-production.sql` loads the real UW subject/breadth-category reference data.
+Separately from the Milestone 0 toy table above, the project's schema lives in a single local MySQL database, `CoursePlanner`. `database/schema.sql` drops and recreates `CoursePlanner`. `database/seed-sample.sql` loads the hand-written sample dataset. Each production seed file inserts into one table: `database/seed-production.sql` fills `SubjectCategory`, `database/seed-production-courses.sql` fills `Course`, `database/seed-production-prereqs.sql` fills `Prereq`, `database/seed-production-coreqs.sql` fills `Coreq`, and `database/seed-production-antireqs.sql` fills `Antireq`.
 
 ### Prerequisites
 
@@ -79,7 +79,7 @@ Set `MYSQL_PASSWORD` to match your local MySQL user (leave blank if that user ha
 ./scripts/setup-db.sh
 ```
 
-This drops and recreates `CoursePlanner` (via `database/schema.sql`), then seeds it from `database/seed-sample.sql` and `database/seed-production.sql`. Every run resets the database — there's no separate `--reset` flag, since `schema.sql` always starts from a clean slate.
+This drops and recreates `CoursePlanner` (via `database/schema.sql`), then loads `database/seed-sample.sql` and each production seed file. Every run resets the database
 
 ### 3. Verifying the database exists
 
@@ -91,7 +91,11 @@ mysql -u root -e "SHOW TABLES IN CoursePlanner;"
 
 ### 4. Adding schema and seed data
 
-Table/constraint/index definitions live in [`database/schema.sql`](database/schema.sql), hand-written sample rows in [`database/seed-sample.sql`](database/seed-sample.sql), and real reference data in [`database/seed-production.sql`](database/seed-production.sql) — keep the two seed files free of overlapping rows, since both load into the same database.
+Table definitions live in [`database/schema.sql`](database/schema.sql). The hand-written sample lives in [`database/seed-sample.sql`](database/seed-sample.sql). Production rows are one file per table: [`database/seed-production.sql`](database/seed-production.sql) (`SubjectCategory`), [`database/seed-production-courses.sql`](database/seed-production-courses.sql) (`Course`), [`database/seed-production-prereqs.sql`](database/seed-production-prereqs.sql) (`Prereq`), [`database/seed-production-coreqs.sql`](database/seed-production-coreqs.sql) (`Coreq`), and [`database/seed-production-antireqs.sql`](database/seed-production-antireqs.sql) (`Antireq`).
+
+`alt_group` is stored on each `Prereq` row. The same number means you only need one of those courses. A different number is a separate requirement.
+
+Production `course_id` values start at 10000 so they do not collide with the sample courses at ids 1–11. The sample courses keep their hand-written prerequisite rows. A production course can still list a sample course as its prerequisite. Every production course is stored as `0.50` units, and `min_term` is null except where the sample seed already set one.
 
 ### Reproducing this setup on a new machine
 

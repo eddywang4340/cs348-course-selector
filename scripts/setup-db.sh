@@ -47,4 +47,16 @@ run_mysql < "$DB_DIR/seed-sample.sql"
 log "Seeding subject/category reference data..."
 run_mysql < "$DB_DIR/seed-production.sql"
 
+log "Seeding production courses..."
+run_mysql < "$DB_DIR/seed-production-courses.sql"
+
+log "Seeding production prerequisites..."
+run_mysql < "$DB_DIR/seed-production-prereqs.sql"
+
+log "Seeding production corequisites..."
+run_mysql < "$DB_DIR/seed-production-coreqs.sql"
+
+log "Seeding production anti-requisites..."
+run_mysql < "$DB_DIR/seed-production-antireqs.sql"
+
 log "Done."
