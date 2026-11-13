@@ -59,4 +59,7 @@ run_mysql < "$DB_DIR/seed-production-coreqs.sql"
 log "Seeding production anti-requisites..."
 run_mysql < "$DB_DIR/seed-production-antireqs.sql"
 
+log "Seeding production user and checklist..."
+run_mysql < "$DB_DIR/seed-production-user.sql"
+
 log "Done."

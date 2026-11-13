@@ -49,7 +49,14 @@ Open the frontend URL printed by `npm run dev` (typically `http://localhost:5173
 
 ## Local MySQL Database Setup
 
-Separately from the Milestone 0 toy table above, the project's schema lives in a single local MySQL database, `CoursePlanner`. `database/schema.sql` drops and recreates `CoursePlanner`. `database/seed-sample.sql` loads the hand-written sample dataset. Each production seed file inserts into one table: `database/seed-production.sql` fills `SubjectCategory`, `database/seed-production-courses.sql` fills `Course`, `database/seed-production-prereqs.sql` fills `Prereq`, `database/seed-production-coreqs.sql` fills `Coreq`, and `database/seed-production-antireqs.sql` fills `Antireq`.
+Separately from the Milestone 0 toy table above, the project's schema lives in a single local MySQL database, `CoursePlanner`. `database/schema.sql` drops and recreates `CoursePlanner`. `database/seed-sample.sql` loads the hand-written sample dataset. Each production seed file inserts into one table:
+
+- `database/seed-production.sql` fills `SubjectCategory`
+- `database/seed-production-courses.sql` fills `Course`
+- `database/seed-production-prereqs.sql` fills `Prereq`
+- `database/seed-production-coreqs.sql` fills `Coreq`
+- `database/seed-production-antireqs.sql` fills `Antireq`
+- `database/seed-production-user.sql` fills `User` and `Checklist`
 
 ### Prerequisites
 
@@ -91,7 +98,14 @@ mysql -u root -e "SHOW TABLES IN CoursePlanner;"
 
 ### 4. Adding schema and seed data
 
-Table definitions live in [`database/schema.sql`](database/schema.sql). The hand-written sample lives in [`database/seed-sample.sql`](database/seed-sample.sql). Production rows are one file per table: [`database/seed-production.sql`](database/seed-production.sql) (`SubjectCategory`), [`database/seed-production-courses.sql`](database/seed-production-courses.sql) (`Course`), [`database/seed-production-prereqs.sql`](database/seed-production-prereqs.sql) (`Prereq`), [`database/seed-production-coreqs.sql`](database/seed-production-coreqs.sql) (`Coreq`), and [`database/seed-production-antireqs.sql`](database/seed-production-antireqs.sql) (`Antireq`).
+Table definitions live in [`database/schema.sql`](database/schema.sql). The hand-written sample lives in [`database/seed-sample.sql`](database/seed-sample.sql). Production rows are one file per table:
+
+- [`database/seed-production.sql`](database/seed-production.sql) (`SubjectCategory`)
+- [`database/seed-production-courses.sql`](database/seed-production-courses.sql) (`Course`)
+- [`database/seed-production-prereqs.sql`](database/seed-production-prereqs.sql) (`Prereq`)
+- [`database/seed-production-coreqs.sql`](database/seed-production-coreqs.sql) (`Coreq`)
+- [`database/seed-production-antireqs.sql`](database/seed-production-antireqs.sql) (`Antireq`)
+- [`database/seed-production-user.sql`](database/seed-production-user.sql) (`User` and `Checklist`)
 
 `alt_group` is stored on each `Prereq` row. The same number means you only need one of those courses. A different number is a separate requirement.
 
