@@ -1,0 +1,255 @@
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R8 (Milestone 2 - Production): Complete a course on the checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Performance measurement and query execution plan on production dataset.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Demonstrates query execution, EXPLAIN plan, and timing on production data.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Query template:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   UPDATE Checklist ch
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   JOIN Course c ON ch.course_id = c.course_id
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   SET ch.status = 'completed'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   WHERE ch.user_id = ?
+--------------
+
+Query OK, 0 rows affected (0.003 sec)
+
+--------------
+--     AND c.subject = ?
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--     AND c.catalog_number = ?;
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+USE CoursePlanner
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Test 1: User 1 (y84huang) completes CS 349 (planned -> completed) on their checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @user_id = 1, @subject = 'CS', @catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Verify current status
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog_number
+--------------
+
++---------+----------------+-----------------+---------+
+| subject | catalog_number | title           | status  |
++---------+----------------+-----------------+---------+
+| CS      | 349            | User Interfaces | planned |
++---------+----------------+-----------------+---------+
+1 row in set (0.001 sec)
+
+--------------
+-- Execution Plan on production data
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+UPDATE Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+SET ch.status = 'completed'
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog_number
+--------------
+
++-----------------------------------------------------------------------------------+
+| EXPLAIN                                                                           |
++-----------------------------------------------------------------------------------+
+| -> Update ch (buffered)
+    -> Rows fetched before execution  (cost=0..0 rows=1)
+ |
++-----------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.002 sec)
+
+--------------
+-- Perform update
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+UPDATE Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+SET ch.status = 'completed'
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog_number
+--------------
+
+Query OK, 1 row affected (0.001 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+-- Verify updated status
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog_number
+--------------
+
++---------+----------------+-----------------+-----------+
+| subject | catalog_number | title           | status    |
++---------+----------------+-----------------+-----------+
+| CS      | 349            | User Interfaces | completed |
++---------+----------------+-----------------+-----------+
+1 row in set (0.004 sec)
+
+--------------
+-- 5 Timed Runs (initial update above serves as warm-up)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+-- Timing measurement (median of 5 runs after warm-up)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R8_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = \'completed\' WHERE ch.user_id = 1%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++----------------------------+
+| R8_timing_ms (last 5 runs) |
++----------------------------+
+|                      0.142 |
+|                       0.16 |
+|                      0.168 |
+|                      0.157 |
+|                      0.189 |
++----------------------------+
+5 rows in set (0.000 sec)
+
+Bye

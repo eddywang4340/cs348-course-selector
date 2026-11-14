@@ -1,0 +1,1249 @@
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- CS 348 Fall 2026 - Milestone 2: test-production.sql
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Covers Features R6, R7, R8, R9, and R10
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Demonstrates query executions, EXPLAIN plans, and performance timings on production data.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+USE CoursePlanner
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R6: Search a course by subject and catalog number
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '348'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Baseline Query Execution
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term
+FROM Course
+WHERE subject = @subject
+  AND catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+-- Query Execution Plan
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+SELECT course_id, subject, catalog_number, title, description, units, min_term
+FROM Course
+WHERE subject = @subject
+  AND catalog_number = @catalog_number
+--------------
+
++-------------------------------------------------------+
+| EXPLAIN                                               |
++-------------------------------------------------------+
+| -> Rows fetched before execution  (cost=0..0 rows=1)
+ |
++-------------------------------------------------------+
+1 row in set, 1 warning (0.002 sec)
+
+--------------
+-- Statement Timing (1 warm-up run + 5 timed runs)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.001 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R6_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = \'CS\' AND catalog_number = \'348\'%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++----------------------------+
+| R6_timing_ms (last 5 runs) |
++----------------------------+
+|                       0.08 |
+|                       0.08 |
+|                       0.09 |
+|                        0.1 |
+|                      0.107 |
++----------------------------+
+5 rows in set (0.009 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R7: Fetch prerequisites & anti-requisites of a course
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Includes BEFORE vs. AFTER optimization pair for symmetric anti-requisite lookup.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '246'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- 1. Prerequisites Query
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT p.prereq_course_id AS course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Prereq p ON p.course_id = c0.course_id
+JOIN Course c ON c.course_id = p.prereq_course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+--------------------------------------------------+
+| course_id | subject | catalog_number | title                                            |
++-----------+---------+----------------+--------------------------------------------------+
+|         2 | CS      | 136            | Elementary Algorithm Design and Data Abstraction |
+|         3 | CS      | 245            | Logic and Computation                            |
++-----------+---------+----------------+--------------------------------------------------+
+2 rows in set (0.001 sec)
+
+--------------
+EXPLAIN
+SELECT p.prereq_course_id AS course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Prereq p ON p.course_id = c0.course_id
+JOIN Course c ON c.course_id = p.prereq_course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| EXPLAIN                                                                                                                                                                                                                                    |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| -> Nested loop inner join  (cost=1.15 rows=2)
+    -> Covering index lookup on p using PRIMARY (course_id = '4')  (cost=0.45 rows=2)
+    -> Single-row index lookup on c using PRIMARY (course_id = p.prereq_course_id)  (cost=0.3 rows=1)
+ |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+-- 2. Anti-requisites Query: BEFORE Optimization
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)
+JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id)
+  AND c.course_id != c0.course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+EXPLAIN
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)
+JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id)
+  AND c.course_id != c0.course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| EXPLAIN                                                                                                                                                                                                                                                                                                                                                                                                                              |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| -> Nested loop inner join  (cost=617267 rows=6.17e+6)
+    -> Filter: ('4' in (a.course_id,a.antireq_course_id))  (cost=138 rows=1371)
+        -> Covering index scan on a using antireq_course_id  (cost=138 rows=1371)
+    -> Filter: ((c.course_id in (a.course_id,a.antireq_course_id)) and (c.course_id <> '4'))  (cost=1.99 rows=4501)
+        -> Index range scan on c (re-planned for each iteration)  (cost=1.99 rows=4501)
+ |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+-- Benchmark Before Optimization (warmup + 5 timed runs)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.005 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.002 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.002 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R7_before_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++-----------------------------------+
+| R7_before_timing_ms (last 5 runs) |
++-----------------------------------+
+|                             1.356 |
+|                              2.01 |
+|                             1.442 |
+|                              0.73 |
+|                             0.842 |
++-----------------------------------+
+5 rows in set (0.000 sec)
+
+--------------
+-- 3. Anti-requisites Query: AFTER Optimization (UNION ALL Rewrite)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON a.course_id = c0.course_id
+JOIN Course c ON c.course_id = a.antireq_course_id
+WHERE c0.subject = @subject AND c0.catalog_number = @catalog_number
+UNION ALL
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON a.antireq_course_id = c0.course_id
+JOIN Course c ON c.course_id = a.course_id
+WHERE c0.subject = @subject AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+EXPLAIN
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON a.course_id = c0.course_id
+JOIN Course c ON c.course_id = a.antireq_course_id
+WHERE c0.subject = @subject AND c0.catalog_number = @catalog_number
+UNION ALL
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON a.antireq_course_id = c0.course_id
+JOIN Course c ON c.course_id = a.course_id
+WHERE c0.subject = @subject AND c0.catalog_number = @catalog_number
+--------------
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| EXPLAIN                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| -> Append  (cost=2.75 rows=5)
+    -> Stream results  (cost=2.05 rows=4)
+        -> Nested loop inner join  (cost=2.05 rows=4)
+            -> Covering index lookup on a using PRIMARY (course_id = '4')  (cost=0.651 rows=4)
+            -> Single-row index lookup on c using PRIMARY (course_id = a.antireq_course_id)  (cost=0.275 rows=1)
+    -> Stream results  (cost=0.7 rows=1)
+        -> Nested loop inner join  (cost=0.7 rows=1)
+            -> Covering index lookup on a using antireq_course_id (antireq_course_id = '4')  (cost=0.35 rows=1)
+            -> Single-row index lookup on c using PRIMARY (course_id = a.course_id)  (cost=0.35 rows=1)
+ |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+-- Benchmark After Optimization (warmup + 5 timed runs)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R7_after_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE '%UNION ALL%SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++----------------------------------+
+| R7_after_timing_ms (last 5 runs) |
++----------------------------------+
+|                            0.096 |
+|                            0.098 |
+|                              0.1 |
+|                            0.104 |
+|                            0.122 |
++----------------------------------+
+5 rows in set (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R8: Complete a course on the checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @user_id = 1, @subject = 'CS', @catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+WHERE ch.user_id = @user_id AND c.subject = @subject AND c.catalog_number = @catalog_number
+--------------
+
++---------+----------------+-----------------+---------+
+| subject | catalog_number | title           | status  |
++---------+----------------+-----------------+---------+
+| CS      | 349            | User Interfaces | planned |
++---------+----------------+-----------------+---------+
+1 row in set (0.000 sec)
+
+--------------
+-- R8 Timing (5 runs after initial warm-up update above)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 1 row affected (0.001 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R8_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = \'completed\' WHERE ch.user_id = 1%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++----------------------------+
+| R8_timing_ms (last 5 runs) |
++----------------------------+
+|                       0.06 |
+|                      0.063 |
+|                      0.065 |
+|                      0.076 |
+|                      0.552 |
++----------------------------+
+5 rows in set (0.000 sec)
+
+--------------
+EXPLAIN
+UPDATE Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+SET ch.status = 'completed'
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog_number
+--------------
+
++-----------------------------------------------------------------------------------+
+| EXPLAIN                                                                           |
++-----------------------------------------------------------------------------------+
+| -> Update ch (buffered)
+    -> Rows fetched before execution  (cost=0..0 rows=1)
+ |
++-----------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+UPDATE Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+SET ch.status = 'completed'
+WHERE ch.user_id = @user_id
+  AND c.subject = @subject
+  AND c.catalog_number = @catalog_number
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+WHERE ch.user_id = @user_id AND c.subject = @subject AND c.catalog_number = @catalog_number
+--------------
+
++---------+----------------+-----------------+-----------+
+| subject | catalog_number | title           | status    |
++---------+----------------+-----------------+-----------+
+| CS      | 349            | User Interfaces | completed |
++---------+----------------+-----------------+-----------+
+1 row in set (0.000 sec)
+
+--------------
+-- R8 Timing (5 runs after initial warm-up update above)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = 'completed' WHERE ch.user_id = 1 AND c.subject = 'CS' AND c.catalog_number = '349'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R8_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'UPDATE Checklist ch JOIN Course c ON ch.course_id = c.course_id SET ch.status = \'completed\' WHERE ch.user_id = 1%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++----------------------------+
+| R8_timing_ms (last 5 runs) |
++----------------------------+
+|                      0.068 |
+|                      0.066 |
+|                      0.081 |
+|                      0.115 |
+|                        0.4 |
++----------------------------+
+5 rows in set (0.001 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R9: Add, update, or remove a course on the checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @user_id = 2, @subject = 'CS', @catalog_number = '245'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- 1. Add course to checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+INSERT INTO Checklist (user_id, course_id, status)
+SELECT @user_id, c.course_id, 'planned'
+FROM Course c
+WHERE c.subject = @subject
+  AND c.catalog_number = @catalog_number
+--------------
+
++------------------------------------------------------------------------------------+
+| EXPLAIN                                                                            |
++------------------------------------------------------------------------------------+
+| -> Insert into Checklist
+    -> Rows fetched before execution  (cost=0..0 rows=1)
+ |
++------------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status)
+SELECT @user_id, c.course_id, 'planned'
+FROM Course c
+WHERE c.subject = @subject
+  AND c.catalog_number = @catalog_number
+ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 1 row affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+-- 2. Update status on checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+UPDATE Checklist
+SET status = 'in_progress'
+WHERE user_id = @user_id
+  AND course_id = (SELECT course_id FROM Course WHERE subject = @subject AND catalog_number = @catalog_number)
+--------------
+
++-------------------------------------------+
+| EXPLAIN                                   |
++-------------------------------------------+
+| -> <not executable by iterator executor>
+ |
++-------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+UPDATE Checklist
+SET status = 'in_progress'
+WHERE user_id = @user_id
+  AND course_id = (SELECT course_id FROM Course WHERE subject = @subject AND catalog_number = @catalog_number)
+--------------
+
+Query OK, 1 row affected (0.000 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+-- 3. Remove course from checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+DELETE FROM Checklist
+WHERE user_id = @user_id
+  AND course_id = (SELECT course_id FROM Course WHERE subject = @subject AND catalog_number = @catalog_number)
+--------------
+
++-------------------------------------------+
+| EXPLAIN                                   |
++-------------------------------------------+
+| -> <not executable by iterator executor>
+ |
++-------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+DELETE FROM Checklist
+WHERE user_id = @user_id
+  AND course_id = (SELECT course_id FROM Course WHERE subject = @subject AND catalog_number = @catalog_number)
+--------------
+
+Query OK, 1 row affected (0.000 sec)
+
+--------------
+-- R9 Timing (1 warm-up + 5 timed runs for Add / Update / Delete)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 1 row affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R9_add_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'INSERT INTO Checklist (user_id, course_id, status) SELECT 2%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++--------------------------------+
+| R9_add_timing_ms (last 5 runs) |
++--------------------------------+
+|                           0.05 |
+|                          0.052 |
+|                          0.053 |
+|                          0.055 |
+|                          0.062 |
++--------------------------------+
+5 rows in set (0.000 sec)
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 1 row affected (0.000 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R9_update_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'UPDATE Checklist SET status = \'in_progress\' WHERE user_id = 2%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++-----------------------------------+
+| R9_update_timing_ms (last 5 runs) |
++-----------------------------------+
+|                             0.065 |
+|                             0.064 |
+|                             0.061 |
+|                             0.065 |
+|                              0.09 |
++-----------------------------------+
+5 rows in set (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 1 row affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R9_delete_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'DELETE FROM Checklist WHERE user_id = 2%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++-----------------------------------+
+| R9_delete_timing_ms (last 5 runs) |
++-----------------------------------+
+|                             0.045 |
+|                             0.048 |
+|                              0.05 |
+|                             0.092 |
+|                             0.053 |
++-----------------------------------+
+5 rows in set (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R10: Fetch courses a user is eligible to take [Eddy]
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- (Top 10 rows retrieved as per M2 guidelines for large datasets)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @user_id = 1
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+SELECT c.course_id, c.subject, c.catalog_number, c.title, c.units, c.min_term
+FROM Course c
+JOIN `User` u ON u.user_id = @user_id
+WHERE (c.min_term IS NULL OR c.min_term <= u.next_study_term)
+  AND NOT EXISTS (SELECT 1 FROM Prereq p
+                  WHERE p.course_id = c.course_id
+                    AND NOT EXISTS (SELECT 1 FROM Prereq same
+                                    JOIN Checklist done
+                                      ON done.user_id = u.user_id
+                                     AND done.course_id = same.prereq_course_id
+                                     AND done.status IN ('completed', 'in_progress')
+                                    WHERE same.course_id = p.course_id
+                                      AND same.alt_group = p.alt_group))
+  AND NOT EXISTS (SELECT 1 FROM Checklist mine
+                  WHERE mine.user_id = u.user_id
+                    AND mine.course_id = c.course_id
+                    AND mine.status IN ('completed', 'in_progress'))
+  AND NOT EXISTS (SELECT 1 FROM Antireq a
+                  JOIN Checklist taken ON taken.user_id = u.user_id
+                                      AND taken.course_id = a.antireq_course_id
+                                      AND taken.status IN ('completed', 'in_progress')
+                  WHERE a.course_id = c.course_id)
+  AND NOT EXISTS (SELECT 1 FROM Antireq a
+                  JOIN Checklist taken ON taken.user_id = u.user_id
+                                      AND taken.course_id = a.course_id
+                                      AND taken.status IN ('completed', 'in_progress')
+                  WHERE a.antireq_course_id = c.course_id)
+ORDER BY c.subject, c.catalog_number
+LIMIT 10
+--------------
+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| EXPLAIN                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| -> Limit: 10 row(s)  (cost=191 rows=4)
+    -> Nested loop antijoin  (cost=191 rows=4)
+        -> Nested loop antijoin  (cost=186 rows=4)
+            -> Nested loop antijoin  (cost=181 rows=4)
+                -> Filter: (((c.min_term is null) or (c.min_term <= '4B')) and (not exists(select #2)))  (cost=0.0903 rows=4)
+                    -> Index scan on c using subject  (cost=0.0903 rows=10)
+                    -> Select #2 (subquery in condition; dependent)
+                        -> Limit: 1 row(s)  (cost=2.87 rows=1)
+                            -> Nested loop antijoin  (cost=2.87 rows=7.37)
+                                -> Index lookup on p using PRIMARY (course_id = c.course_id)  (cost=0.772 rows=2.72)
+                                -> Nested loop inner join  (cost=2.72 rows=2.72)
+                                    -> Filter: (same.alt_group = p.alt_group)  (cost=0.6 rows=2.72)
+                                        -> Index lookup on same using PRIMARY (course_id = p.course_id)  (cost=0.6 rows=2.72)
+                                    -> Filter: (done.`status` in ('completed','in_progress'))  (cost=0.716 rows=1)
+                                        -> Single-row index lookup on done using PRIMARY (user_id = '1', course_id = same.prereq_course_id)  (cost=0.716 rows=1)
+                -> Filter: (`<subquery5>`.user_id = <cache>((@user_id)))  (cost=3.92 rows=1)
+                    -> Single-row index lookup on <subquery5> using <auto_distinct_key> (course_id = c.course_id, user_id = '1')  (cost=53.7..53.7 rows=1)
+                        -> Materialize with deduplication  (cost=49.8..49.8 rows=101)
+                            -> Filter: ((a.course_id is not null) and (taken.user_id is not null))  (cost=26.5 rows=101)
+                                -> Nested loop inner join  (cost=26.5 rows=101)
+                                    -> Filter: (taken.`status` in ('completed','in_progress'))  (cost=4.86 rows=46)
+                                        -> Index lookup on taken using PRIMARY (user_id = (@user_id))  (cost=4.86 rows=46)
+                                    -> Covering index lookup on a using antireq_course_id (antireq_course_id = taken.course_id)  (cost=0.255 rows=2.2)
+            -> Filter: (`<subquery6>`.user_id = <cache>((@user_id)))  (cost=0.102 rows=1)
+                -> Single-row index lookup on <subquery6> using <auto_distinct_key> (antireq_course_id = c.course_id, user_id = '1')  (cost=51.3..51.3 rows=1)
+                    -> Materialize with deduplication  (cost=51.2..51.2 rows=105)
+                        -> Filter: ((a.antireq_course_id is not null) and (taken.user_id is not null))  (cost=26.9 rows=105)
+                            -> Nested loop inner join  (cost=26.9 rows=105)
+                                -> Filter: (taken.`status` in ('completed','in_progress'))  (cost=4.86 rows=46)
+                                    -> Index lookup on taken using PRIMARY (user_id = (@user_id))  (cost=4.86 rows=46)
+                                -> Covering index lookup on a using PRIMARY (course_id = taken.course_id)  (cost=0.256 rows=2.29)
+        -> Filter: (`<subquery4>`.user_id = <cache>((@user_id)))  (cost=0.102 rows=1)
+            -> Single-row index lookup on <subquery4> using <auto_distinct_key> (user_id = '1', course_id = c.course_id)  (cost=15.6..15.6 rows=1)
+                -> Materialize with deduplication  (cost=15.5..15.5 rows=46)
+                    -> Filter: ((mine.user_id is not null) and (mine.course_id is not null))  (cost=4.86 rows=46)
+                        -> Filter: (mine.`status` in ('completed','in_progress'))  (cost=4.86 rows=46)
+                            -> Index lookup on mine using PRIMARY (user_id = (@user_id))  (cost=4.86 rows=46)
+ |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set, 11 warnings (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title, c.units, c.min_term
+FROM Course c
+JOIN `User` u ON u.user_id = @user_id
+WHERE (c.min_term IS NULL OR c.min_term <= u.next_study_term)
+  AND NOT EXISTS (SELECT 1 FROM Prereq p
+                  WHERE p.course_id = c.course_id
+                    AND NOT EXISTS (SELECT 1 FROM Prereq same
+                                    JOIN Checklist done
+                                      ON done.user_id = u.user_id
+                                     AND done.course_id = same.prereq_course_id
+                                     AND done.status IN ('completed', 'in_progress')
+                                    WHERE same.course_id = p.course_id
+                                      AND same.alt_group = p.alt_group))
+  AND NOT EXISTS (SELECT 1 FROM Checklist mine
+                  WHERE mine.user_id = u.user_id
+                    AND mine.course_id = c.course_id
+                    AND mine.status IN ('completed', 'in_progress'))
+  AND NOT EXISTS (SELECT 1 FROM Antireq a
+                  JOIN Checklist taken ON taken.user_id = u.user_id
+                                      AND taken.course_id = a.antireq_course_id
+                                      AND taken.status IN ('completed', 'in_progress')
+                  WHERE a.course_id = c.course_id)
+  AND NOT EXISTS (SELECT 1 FROM Antireq a
+                  JOIN Checklist taken ON taken.user_id = u.user_id
+                                      AND taken.course_id = a.course_id
+                                      AND taken.status IN ('completed', 'in_progress')
+                  WHERE a.antireq_course_id = c.course_id)
+ORDER BY c.subject, c.catalog_number
+LIMIT 10
+--------------
+
++-----------+---------+----------------+------------------------------------------------+-------+----------+
+| course_id | subject | catalog_number | title                                          | units | min_term |
++-----------+---------+----------------+------------------------------------------------+-------+----------+
+|     17582 | AB      | 201W           | Intermediate Arabic 1(WLU)                     |  0.50 | NULL     |
+|     18693 | ACTSC   | 362            | Introduction to Property and Casualty Practice |  0.50 | NULL     |
+|     17758 | ACTSC   | 363            | Casualty and Health Insurance Mathematics 1    |  0.50 | NULL     |
+|     10068 | ACTSC   | 468            | Readings in Actuarial Science 1                |  0.50 | NULL     |
+|     10069 | ACTSC   | 469            | Readings in Actuarial Science 2                |  0.50 | NULL     |
+|     10071 | ACTSC   | 489            | Advanced Topics in Actuarial Science           |  0.50 | NULL     |
+|     18362 | AE      | 100            | Concepts Studio                                |  0.50 | NULL     |
+|     18153 | AE      | 101            | History of the Built Environment               |  0.50 | NULL     |
+|     18161 | AE      | 104            | Mechanics 1                                    |  0.50 | NULL     |
+|     18308 | AE      | 121            | Computational Methods                          |  0.50 | NULL     |
++-----------+---------+----------------+------------------------------------------------+-------+----------+
+10 rows in set (0.001 sec)
+
+Bye

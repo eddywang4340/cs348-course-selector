@@ -1,0 +1,241 @@
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R6 (Milestone 2 - Production): Search a course by subject and catalog number
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Performance measurement and query execution plan on production dataset.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Demonstrates query execution, EXPLAIN plan, warm-up, and 5-run timing
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- retrieved from performance_schema.events_statements_history.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Query template:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   SELECT course_id, subject, catalog_number, title, description, units, min_term
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   FROM Course
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   WHERE subject = ?
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--     AND catalog_number = ?;
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+USE CoursePlanner
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Test 1: Search for an existing core course (CS 348)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '348'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term
+FROM Course
+WHERE subject = @subject
+  AND catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.001 sec)
+
+--------------
+-- Test 1: Query Execution Plan on production data
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+SELECT course_id, subject, catalog_number, title, description, units, min_term
+FROM Course
+WHERE subject = @subject
+  AND catalog_number = @catalog_number
+--------------
+
++-------------------------------------------------------+
+| EXPLAIN                                               |
++-------------------------------------------------------+
+| -> Rows fetched before execution  (cost=0..0 rows=1)
+ |
++-------------------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+-- Test 1: Performance Timing (1 warm-up run + 5 timed runs in same session)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Warm-up:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+-- 5 Timed Runs:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = 'CS' AND catalog_number = '348'
+--------------
+
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+| course_id | subject | catalog_number | title                               | description | units | min_term |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+|         7 | CS      | 348            | Introduction to Database Management | NULL        |  0.50 | 3A       |
++-----------+---------+----------------+-------------------------------------+-------------+-------+----------+
+1 row in set (0.000 sec)
+
+--------------
+-- Retrieve statement execution times in milliseconds
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `ms (last 5 runs, median reported in report)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'SELECT course_id, subject, catalog_number, title, description, units, min_term FROM Course WHERE subject = \'CS\' AND catalog_number = \'348\'%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++---------------------------------------------+
+| ms (last 5 runs, median reported in report) |
++---------------------------------------------+
+|                                       0.077 |
+|                                       0.086 |
+|                                       0.074 |
+|                                       0.101 |
+|                                       0.077 |
++---------------------------------------------+
+5 rows in set (0.001 sec)
+
+Bye

@@ -1,0 +1,514 @@
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R7 (Milestone 2 - Production): Fetch prereqs & antireqs of a course
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Includes BEFORE vs. AFTER query optimization pair for symmetric anti-requisite lookup.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Optimization Rationale:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- - Before: Using `c0.course_id IN (a.course_id, a.antireq_course_id)` evaluates as a
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   disjunction (OR), preventing the optimizer from performing indexed ref lookups on
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   Antireq, leading to full table scans (type: ALL) and a hash join.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- - After: Restructured into a UNION ALL of two directed indexed lookups. Because
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   anti-requisite pairs are stored with course_id < antireq_course_id, the two branches
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   are mutually exclusive. Both branches execute via indexed ref / eq_ref lookups
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   (O(1) cost), eliminating full table scans without requiring any extra secondary indexes.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+USE CoursePlanner
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Part 1: Prerequisites Query on Production
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '246'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT p.prereq_course_id AS course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Prereq p ON p.course_id = c0.course_id
+JOIN Course c ON c.course_id = p.prereq_course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+--------------------------------------------------+
+| course_id | subject | catalog_number | title                                            |
++-----------+---------+----------------+--------------------------------------------------+
+|         2 | CS      | 136            | Elementary Algorithm Design and Data Abstraction |
+|         3 | CS      | 245            | Logic and Computation                            |
++-----------+---------+----------------+--------------------------------------------------+
+2 rows in set (0.001 sec)
+
+--------------
+EXPLAIN
+SELECT p.prereq_course_id AS course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Prereq p ON p.course_id = c0.course_id
+JOIN Course c ON c.course_id = p.prereq_course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| EXPLAIN                                                                                                                                                                                                                                    |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| -> Nested loop inner join  (cost=1.15 rows=2)
+    -> Covering index lookup on p using PRIMARY (course_id = '4')  (cost=0.45 rows=2)
+    -> Single-row index lookup on c using PRIMARY (course_id = p.prereq_course_id)  (cost=0.3 rows=1)
+ |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Part 2: Anti-requisites Query: BEFORE Optimization
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '246'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)
+JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id)
+  AND c.course_id != c0.course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+EXPLAIN
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)
+JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id)
+  AND c.course_id != c0.course_id
+WHERE c0.subject = @subject
+  AND c0.catalog_number = @catalog_number
+--------------
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| EXPLAIN                                                                                                                                                                                                                                                                                                                                                                                                                              |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| -> Nested loop inner join  (cost=617267 rows=6.17e+6)
+    -> Filter: ('4' in (a.course_id,a.antireq_course_id))  (cost=138 rows=1371)
+        -> Covering index scan on a using antireq_course_id  (cost=138 rows=1371)
+    -> Filter: ((c.course_id in (a.course_id,a.antireq_course_id)) and (c.course_id <> '4'))  (cost=1.99 rows=4501)
+        -> Index range scan on c (re-planned for each iteration)  (cost=1.99 rows=4501)
+ |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+-- Benchmark Before Optimization (warmup + 5 timed runs)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id) JOIN Course c ON c.course_id IN (a.course_id, a.antireq_course_id) AND c.course_id != c0.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `before_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON c0.course_id IN (a.course_id, a.antireq_course_id)%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++-------------------------+
+| before_ms (last 5 runs) |
++-------------------------+
+|                   0.873 |
+|                   0.864 |
+|                   0.919 |
+|                   0.731 |
+|                   0.685 |
++-------------------------+
+5 rows in set (0.001 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Part 3: Anti-requisites Query: AFTER Optimization (UNION ALL Rewrite)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @subject = 'CS', @catalog_number = '246'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON a.course_id = c0.course_id
+JOIN Course c ON c.course_id = a.antireq_course_id
+WHERE c0.subject = @subject AND c0.catalog_number = @catalog_number
+UNION ALL
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON a.antireq_course_id = c0.course_id
+JOIN Course c ON c.course_id = a.course_id
+WHERE c0.subject = @subject AND c0.catalog_number = @catalog_number
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+EXPLAIN
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON a.course_id = c0.course_id
+JOIN Course c ON c.course_id = a.antireq_course_id
+WHERE c0.subject = @subject AND c0.catalog_number = @catalog_number
+UNION ALL
+SELECT c.course_id, c.subject, c.catalog_number, c.title
+FROM Course c0
+JOIN Antireq a ON a.antireq_course_id = c0.course_id
+JOIN Course c ON c.course_id = a.course_id
+WHERE c0.subject = @subject AND c0.catalog_number = @catalog_number
+--------------
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| EXPLAIN                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| -> Append  (cost=2.75 rows=5)
+    -> Stream results  (cost=2.05 rows=4)
+        -> Nested loop inner join  (cost=2.05 rows=4)
+            -> Covering index lookup on a using PRIMARY (course_id = '4')  (cost=0.651 rows=4)
+            -> Single-row index lookup on c using PRIMARY (course_id = a.antireq_course_id)  (cost=0.275 rows=1)
+    -> Stream results  (cost=0.7 rows=1)
+        -> Nested loop inner join  (cost=0.7 rows=1)
+            -> Covering index lookup on a using antireq_course_id (antireq_course_id = '4')  (cost=0.35 rows=1)
+            -> Single-row index lookup on c using PRIMARY (course_id = a.course_id)  (cost=0.35 rows=1)
+ |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.001 sec)
+
+--------------
+-- Benchmark After Optimization (warmup + 5 timed runs)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.001 sec)
+
+--------------
+SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.course_id = c0.course_id JOIN Course c ON c.course_id = a.antireq_course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246' UNION ALL SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id JOIN Course c ON c.course_id = a.course_id WHERE c0.subject = 'CS' AND c0.catalog_number = '246'
+--------------
+
++-----------+---------+----------------+-------------------------------------------------+
+| course_id | subject | catalog_number | title                                           |
++-----------+---------+----------------+-------------------------------------------------+
+|        11 | CS      | 246E           | Object-Oriented Software Development (Enriched) |
+|     11419 | CS      | 247            | Software Engineering Principles                 |
+|     17299 | SYDE    | 322            | Software Design                                 |
+|     18831 | MSE     | 342            | Principles of Software Engineering              |
++-----------+---------+----------------+-------------------------------------------------+
+4 rows in set (0.000 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `after_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE '%UNION ALL%SELECT c.course_id, c.subject, c.catalog_number, c.title FROM Course c0 JOIN Antireq a ON a.antireq_course_id = c0.course_id%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++------------------------+
+| after_ms (last 5 runs) |
++------------------------+
+|                  0.243 |
+|                  0.604 |
+|                  0.237 |
+|                  0.223 |
+|                  0.262 |
++------------------------+
+5 rows in set (0.000 sec)
+
+Bye
