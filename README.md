@@ -10,24 +10,15 @@
 
 Feature 3 changes data; run `./scripts/setup-db.sh` to reset it.
 
-## Milestone 0 Database Setup
+## Running the application
 
-This section demonstrates that the app can connect to a database and query rows from it. The table used here (`courses`) is a **simplified toy table for testing the connection only**, and is **not** the project's final schema, which will be designed in a later milestone.
+### 1. Create and load the database
 
-The database is local MySQL (see "Local MySQL Database Setup" below) -- run that section first so `CoursePlanner` exists.
-
-### 1. Create the toy table and load sample rows
-
-```
-mysql -u root CoursePlanner < backend/schema.sql
-mysql -u root CoursePlanner < backend/seed.sql
-```
-
-(add `-p` if your local MySQL user has a password).
+Follow "Local MySQL Database Setup" below (`./scripts/setup-db.sh`) so `CoursePlanner` exists and holds the sample and production data.
 
 ### 2. Configure environment variables
 
-Copy `backend/.env.example` to `backend/.env` and adjust if needed (defaults match local MySQL with no password):
+Copy `backend/.env.example` to `backend/.env` and adjust if needed (defaults match local MySQL with no password, and `MYSQL_DATABASE=CoursePlanner`):
 
 ```
 cp backend/.env.example backend/.env
@@ -53,13 +44,15 @@ npm install
 npm run dev
 ```
 
-### 4. Confirm the database query works
+### 4. Use the app
 
-Open the frontend URL printed by `npm run dev` (typically `http://localhost:5173`) and click "Send request". If the connection and query succeed, the page will list the 3 seeded courses (e.g. `CS 348: Introduction to Database Management`). If something is misconfigured, a "Could not read a response from the backend." message will be shown instead.
+Open the frontend URL printed by `npm run dev` (typically `http://localhost:5173`). Each implemented feature (see the table above) is shown as its own row: type in the inputs, or click a **Try:** preset to run one of the report's test cases. If the backend or database is misconfigured, the page shows "Could not read a response from the backend."
+
+The Milestone 0 toy table (`backend/schema.sql`, `backend/seed.sql`) and its `GET /api/hello` endpoint are kept only as the original connection test; the features above do not use them.
 
 ## Local MySQL Database Setup
 
-Separately from the Milestone 0 toy table above, the project's schema lives in a single local MySQL database, `CoursePlanner`. `database/schema.sql` drops and recreates `CoursePlanner`. `database/seed-sample.sql` loads the hand-written sample dataset. Each production seed file inserts into one table:
+The project's schema lives in a single local MySQL database, `CoursePlanner`. `database/schema.sql` drops and recreates `CoursePlanner`. `database/seed-sample.sql` loads the hand-written sample dataset. Each production seed file inserts into one table:
 
 - `database/seed-production.sql` fills `SubjectCategory`
 - `database/seed-production-courses.sql` fills `Course`
@@ -120,6 +113,16 @@ Table definitions live in [`database/schema.sql`](database/schema.sql). The hand
 `alt_group` is stored on each `Prereq` row. The same number means you only need one of those courses. A different number is a separate requirement.
 
 Production `course_id` values start at 10000 so they do not collide with the sample courses at ids 1–11. The sample courses keep their hand-written prerequisite rows. A production course can still list a sample course as its prerequisite. Every production course is stored as `0.50` units, and `min_term` is null except where the sample seed already set one.
+
+### Production dataset: sources
+
+The production data is committed as the SQL seed files above, so `./scripts/setup-db.sh` loads it directly; no download is needed to reproduce the database.
+
+| Seed file | Source |
+|---|---|
+| `seed-production-courses.sql`, `-prereqs.sql`, `-coreqs.sql`, `-antireqs.sql` | Fetched from the University of Waterloo Open Data API (https://openapi.data.uwaterloo.ca/): undergraduate courses scheduled at least once from Fall 2024 through Winter 2027, and their requisites. |
+| `seed-production.sql` (`SubjectCategory`) | CS breadth and depth requirements: https://cs.uwaterloo.ca/current/programs/require/2011-2012/depthAndBreadth |
+| `seed-production-user.sql` (`User`, `Checklist`) | Transcribed by hand from y84huang's filled-in 2023–2024 BCS checklist |
 
 ### Reproducing this setup on a new machine
 
