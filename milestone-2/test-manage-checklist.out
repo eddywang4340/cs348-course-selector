@@ -1,0 +1,565 @@
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Feature R9 (Milestone 2 - Production): Add, update, or remove a course on the checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Performance measurement and query execution plans on production dataset.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Demonstrates Add, Update, and Remove mutations, EXPLAIN plans, and timings.
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Query templates:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   -- Add:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   INSERT INTO Checklist (user_id, course_id, status)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   SELECT ?, c.course_id, ?
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   FROM Course c
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   WHERE c.subject = ? AND c.catalog_number = ?;
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   -- Update:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   UPDATE Checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   SET status = ?
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   WHERE user_id = ? AND course_id = ?;
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   -- Remove:
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   DELETE FROM Checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--   WHERE user_id = ?
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+--     AND course_id = (SELECT course_id FROM Course WHERE subject = ? AND catalog_number = ?);
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ============================================================
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+USE CoursePlanner
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SET @user_id = 2, @subject = 'CS', @catalog_number = '245'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Test 1: Add a course to the checklist (CS 245 as planned)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+INSERT INTO Checklist (user_id, course_id, status)
+SELECT @user_id, c.course_id, 'planned'
+FROM Course c
+WHERE c.subject = @subject
+  AND c.catalog_number = @catalog_number
+--------------
+
++------------------------------------------------------------------------------------+
+| EXPLAIN                                                                            |
++------------------------------------------------------------------------------------+
+| -> Insert into Checklist
+    -> Rows fetched before execution  (cost=0..0 rows=1)
+ |
++------------------------------------------------------------------------------------+
+1 row in set, 1 warning (0.001 sec)
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status)
+SELECT @user_id, c.course_id, 'planned'
+FROM Course c
+WHERE c.subject = @subject
+  AND c.catalog_number = @catalog_number
+ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 1 row affected (0.001 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+-- Verify added row
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+WHERE ch.user_id = @user_id AND c.subject = @subject AND c.catalog_number = @catalog_number
+--------------
+
++---------+----------------+-----------------------+---------+
+| subject | catalog_number | title                 | status  |
++---------+----------------+-----------------------+---------+
+| CS      | 245            | Logic and Computation | planned |
++---------+----------------+-----------------------+---------+
+1 row in set (0.002 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Test 2: Update status on checklist (planned -> in_progress)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+UPDATE Checklist
+SET status = 'in_progress'
+WHERE user_id = @user_id
+  AND course_id = (
+      SELECT course_id
+      FROM Course
+      WHERE subject = @subject AND catalog_number = @catalog_number
+  )
+--------------
+
++-------------------------------------------+
+| EXPLAIN                                   |
++-------------------------------------------+
+| -> <not executable by iterator executor>
+ |
++-------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+UPDATE Checklist
+SET status = 'in_progress'
+WHERE user_id = @user_id
+  AND course_id = (
+      SELECT course_id
+      FROM Course
+      WHERE subject = @subject AND catalog_number = @catalog_number
+  )
+--------------
+
+Query OK, 1 row affected (0.001 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+-- Verify updated row
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+WHERE ch.user_id = @user_id AND c.subject = @subject AND c.catalog_number = @catalog_number
+--------------
+
++---------+----------------+-----------------------+-------------+
+| subject | catalog_number | title                 | status      |
++---------+----------------+-----------------------+-------------+
+| CS      | 245            | Logic and Computation | in_progress |
++---------+----------------+-----------------------+-------------+
+1 row in set (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Test 3: Remove course from checklist
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+EXPLAIN
+DELETE FROM Checklist
+WHERE user_id = @user_id
+  AND course_id = (
+      SELECT course_id
+      FROM Course
+      WHERE subject = @subject AND catalog_number = @catalog_number
+  )
+--------------
+
++-------------------------------------------+
+| EXPLAIN                                   |
++-------------------------------------------+
+| -> <not executable by iterator executor>
+ |
++-------------------------------------------+
+1 row in set, 1 warning (0.000 sec)
+
+--------------
+DELETE FROM Checklist
+WHERE user_id = @user_id
+  AND course_id = (
+      SELECT course_id
+      FROM Course
+      WHERE subject = @subject AND catalog_number = @catalog_number
+  )
+--------------
+
+Query OK, 1 row affected (0.001 sec)
+
+--------------
+-- Verify deletion (Empty set expected)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT c.subject, c.catalog_number, c.title, ch.status
+FROM Checklist ch
+JOIN Course c ON ch.course_id = c.course_id
+WHERE ch.user_id = @user_id AND c.subject = @subject AND c.catalog_number = @catalog_number
+--------------
+
+Empty set (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Timing measurements (1 warm-up + 5 timed runs each)
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- ------------------------------------------------------------
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+-- Add timing
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 1 row affected (0.001 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.006 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+INSERT INTO Checklist (user_id, course_id, status) SELECT 2, c.course_id, 'planned' FROM Course c WHERE c.subject = 'CS' AND c.catalog_number = '245' ON DUPLICATE KEY UPDATE status = 'planned'
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R9_add_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'INSERT INTO Checklist (user_id, course_id, status) SELECT 2%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++--------------------------------+
+| R9_add_timing_ms (last 5 runs) |
++--------------------------------+
+|                          0.113 |
+|                          0.117 |
+|                          0.114 |
+|                          0.139 |
+|                          6.379 |
++--------------------------------+
+5 rows in set (0.000 sec)
+
+--------------
+-- Update timing
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 1 row affected (0.001 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+UPDATE Checklist SET status = 'in_progress' WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+Rows matched: 1  Changed: 0  Warnings: 0
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R9_update_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'UPDATE Checklist SET status = \'in_progress\' WHERE user_id = 2%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++-----------------------------------+
+| R9_update_timing_ms (last 5 runs) |
++-----------------------------------+
+|                             0.113 |
+|                             0.117 |
+|                             0.161 |
+|                             0.148 |
+|                             0.149 |
++-----------------------------------+
+5 rows in set (0.000 sec)
+
+--------------
+-- Delete timing
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 1 row affected (0.001 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+DELETE FROM Checklist WHERE user_id = 2 AND course_id = (SELECT course_id FROM Course WHERE subject = 'CS' AND catalog_number = '245')
+--------------
+
+Query OK, 0 rows affected (0.000 sec)
+
+--------------
+SELECT ROUND(TIMER_WAIT/1e9, 3) AS `R9_delete_timing_ms (last 5 runs)`
+FROM performance_schema.events_statements_history
+WHERE SQL_TEXT LIKE 'DELETE FROM Checklist WHERE user_id = 2%'
+ORDER BY EVENT_ID DESC LIMIT 5
+--------------
+
++-----------------------------------+
+| R9_delete_timing_ms (last 5 runs) |
++-----------------------------------+
+|                             0.097 |
+|                             0.106 |
+|                             0.098 |
+|                             0.104 |
+|                             0.113 |
++-----------------------------------+
+5 rows in set (0.000 sec)
+
+Bye
