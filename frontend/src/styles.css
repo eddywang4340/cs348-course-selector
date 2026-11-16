@@ -106,7 +106,9 @@ h1 {
   gap: 0.4rem;
 }
 
-.search-form input {
+.search-form input,
+.search-form select {
+  background: #fff;
   border: 1px solid #ded5c7;
   border-radius: 0.75rem;
   color: #1d2622;
@@ -114,7 +116,8 @@ h1 {
   padding: 0.8rem 0.9rem;
 }
 
-.search-form input:focus-visible {
+.search-form input:focus-visible,
+.search-form select:focus-visible {
   outline: 3px solid #2a9d8f;
   outline-offset: 2px;
 }
@@ -130,7 +133,7 @@ h1 {
   padding-top: 1.5rem;
 }
 
-.course-result h2 {
+.course-result h3 {
   font-family: 'Space Mono', monospace;
   font-size: 0.95rem;
   letter-spacing: 0.04em;
@@ -161,4 +164,138 @@ h1 {
 .course-result dd {
   line-height: 1.5;
   margin: 0.2rem 0 0;
+}
+
+.feature {
+  border-top: 1px solid #ded5c7;
+  margin-top: 2rem;
+  padding-top: 2rem;
+}
+
+.feature .eyebrow {
+  margin-bottom: 0.5rem;
+}
+
+.feature-title {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+}
+
+.course-list {
+  display: grid;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.course-list .code {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-right: 0.6rem;
+  min-width: 6.5rem;
+}
+
+.empty {
+  color: #58615c;
+  font-style: italic;
+  margin: 0;
+}
+
+.presets {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.presets span {
+  color: #58615c;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+button.preset {
+  background: transparent;
+  border: 1px solid #2a9d8f;
+  color: #2a9d8f;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.8rem;
+}
+
+button.preset:hover {
+  background: #2a9d8f;
+  color: #fffaf3;
+}
+
+.checklist-scroll {
+  border: 1px solid #ded5c7;
+  border-radius: 0.75rem;
+  margin-top: 1rem;
+  max-height: 22rem;
+  overflow: auto;
+}
+
+.checklist {
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.checklist th {
+  background: #f4efe6;
+  color: #2a9d8f;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  padding: 0.6rem 0.75rem;
+  position: sticky;
+  text-align: left;
+  text-transform: uppercase;
+  top: 0;
+}
+
+.checklist td {
+  border-top: 1px solid #ede6da;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+}
+
+.checklist td.code {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.checklist tr.highlight td {
+  background: #fdebd3;
+}
+
+.badge {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+}
+
+.badge-planned {
+  background: #ede6da;
+  color: #58615c;
+}
+
+.badge-in_progress {
+  background: #fde2c4;
+  color: #9a4a1c;
+}
+
+.badge-completed {
+  background: #d4eeea;
+  color: #1f6f66;
 }

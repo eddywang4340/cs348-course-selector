@@ -1,5 +1,15 @@
 # cs348-course-selector
 
+## Implemented features
+
+| Feature | What it does | Backend endpoint ([backend/app.py](backend/app.py)) | Frontend component ([frontend/src/main.jsx](frontend/src/main.jsx)) |
+|---|---|---|---|
+| 1 (R6) | Search a course by subject and catalog number | `GET /api/courses/search?subject=&catalog_number=` | `CourseSearchFeature` |
+| 2 (R7) | Show a course's prerequisites and anti-requisites (anti-reqs are matched on either side of the stored pair, using the optimized `UNION ALL` query from R7-c) | `GET /api/courses/requisites?subject=&catalog_number=` | `RequisitesFeature` |
+| 3 (R8) | Mark a course on a user's checklist as completed, telling apart "completed", "already completed", and "not on your checklist" | `POST /api/checklist/complete` (JSON body `user_id`, `subject`, `catalog_number`), plus `GET /api/checklist?user_id=` to display the checklist | `CompleteCourseFeature` |
+
+Feature 3 changes data; run `./scripts/setup-db.sh` to reset it.
+
 ## Milestone 0 Database Setup
 
 This section demonstrates that the app can connect to a database and query rows from it. The table used here (`courses`) is a **simplified toy table for testing the connection only**, and is **not** the project's final schema, which will be designed in a later milestone.
